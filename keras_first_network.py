@@ -23,8 +23,8 @@ X = dataset[:,0:8]
 Y = dataset[:,8]
 # create model
 model = Sequential()
-model.add(Dense(128, input_dim=8, kernel_initializer='uniform', activation='relu'))
-model.add(Dense(16, kernel_initializer='uniform', activation='relu'))
+model.add(Dense(8, input_dim=8, kernel_initializer='uniform', activation='relu'))
+model.add(Dense(8, kernel_initializer='uniform', activation='relu'))
 model.add(Dense(1, kernel_initializer='uniform', activation='sigmoid'))
 # Compile model
 
@@ -32,7 +32,7 @@ starttime = time.time()
 
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 # Fit the model
-history = model.fit(X, Y, validation_split=0.1, epochs=2000, batch_size=50, verbose=1)
+history = model.fit(X, Y, validation_split=0.06, epochs=1000, batch_size=50, verbose=1)
 scores = model.evaluate(X, Y)
 print("%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
 

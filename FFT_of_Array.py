@@ -3,25 +3,26 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from numpy import array
+from numpy import random
 
-#This is how you generate a Synthetic Signal
+N = 100000
+
+#Generating a Synthetic Signal
 # linspace creates a lineared spaced vector (goes from 0 to 2pi in 1000 points)
-t = np.linspace(0, 2*np.pi, 1000, endpoint=True)
-f = 3.0 # Frequency in Hz
-A = 100.0 # Amplitude in Unit
-
+t = np.linspace(0,20*2*np.pi, N, endpoint=True)
+A = 1000 # Amplitude in Unit
+fo = 3
 #s is now a vector of 1000 points since t has 1000 points
-s = A * np.sin(2*np.pi*f*t) # Signal
 
-plt.plot(t,s)
-plt.xlabel('Time ($s$)')
-plt.ylabel('Amplitude ($Unit$)')
-plt.show()
+#bigdata = np.zeros((tsize,Nsignal))
+#print(bigdata)
+s = A*np.sin(t*2*np.pi*fo)
 
 ################  Fucking-Chuck-Norris-Fast-FFT   #############################
-#Now we are going to create a Fourier Transform (of variable
+#Now we are going to create a Fourier Transform of variable s
 Y = np.fft.fft(s)
-N = int(len(Y)/2 + 1)
+print(len(Y))
+fft_size = int(len(Y)/2 + 1)
 
 #Now we need to adjust the frequency and the Amplitude axis
 #Stating with the Frequency Axix (x-Axis)
@@ -33,7 +34,8 @@ print('fa=%.2fHz (Frequency)' % fa)
 
 #Building Nyquist-Shannon-Frequency from the Nyquist-Shannon Sampling Theorem
 
-X = np.linspace(0, fa/2, N, endpoint=True)
+X = np.linspace(0, fa/2, fft_size, endpoint=True)
+
 
 # Correcting Wrong Amplitude Spectrum because of Leakage Effect
 # We need a window function to get a periodic signal from real data
@@ -41,6 +43,10 @@ X = np.linspace(0, fa/2, N, endpoint=True)
 
 hann = np.hanning(len(s))
 Yhann = np.fft.fft(hann*s)
+
+
+Y_FFT = 2.0*np.abs(Yhann[:fft_size])/fft_size
+print(max(Y_FFT))
 
 plt.figure(figsize=(7,3))
 plt.subplot(121)
@@ -51,8 +57,10 @@ plt.xlabel('Time ($s$)')
 plt.ylabel('Amplitude ($Unit$)')
 
 plt.subplot(122)
-plt.plot(X, 2.0*np.abs(Yhann[:N])/N)
+plt.plot(X, 2.0*np.abs(Yhann[:fft_size])/fft_size)
 plt.title('Frequency Domain Signal')
+plt.xlim(0,120)
+plt.ylim(0,1200)
 plt.xlabel('Frequency ($Hz$)')
 plt.ylabel('Amplitude ($Unit$)')
 
@@ -60,9 +68,3 @@ plt.tight_layout()
 
 plt.savefig('FFT.png',bbox_inches='tight', dpi=150, transparent=True)
 plt.show()
-
-#importing a file -not working yet
-
-df = pd.read_csv('Vertikale_Netzlast_2013.csv', header=6, sep=';', parse_dates=[[0, 1]], index_col=0, na_values=['n.v.'])
-df.rename(columns={'Unnamed: 3': 'Load'}, inplace=True)
-#interpoling df for missing data
